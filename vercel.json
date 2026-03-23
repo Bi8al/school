@@ -1,19 +1,23 @@
 {
   "version": 2,
+  "buildCommand": "npm install && npm run build",
   "builds": [
     {
       "src": "backend/index.js",
       "use": "@vercel/node",
       "config": {
-        "includeFiles": "backend/**"
+        "includeFiles": "backend/**",
+        "functions": {
+          "api/**/*.js": {
+            "memory": 1024,
+            "maxDuration": 60
+          }
+        }
       }
     },
     {
-      "src": "frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "frontend/build"
-      }
+      "src": "public",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
@@ -23,7 +27,15 @@
     },
     {
       "src": "/(.*)",
-      "dest": "frontend/build/$1"
+      "dest": "/public/$1",
+      "continue": true
+    },
+    {
+      "src": "/.*",
+      "dest": "/public/index.html"
     }
-  ]
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
 }
